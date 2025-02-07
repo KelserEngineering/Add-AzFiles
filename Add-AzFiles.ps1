@@ -43,7 +43,7 @@ function ImportParams {
             OuDistinguishedName = Read-Host -Prompt "OU Distinguished Name"
             FileShare = Read-Host -Prompt "Azure Files fileshare"
         }
-        Export-Csv -Path $CsvFilePath -NoTypeInformation
+        $params | Export-Csv -Path $CsvFilePath -NoTypeInformation
     }
     return $params
 }
