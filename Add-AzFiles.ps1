@@ -62,22 +62,21 @@ $DomainAccountType = $Params.DomainAccountType
 $OuDistinguishedName = $Params.OuDistinguishedName
 $FileShare = $Params.FileShare
 
-function SetShareLvlPermissions {
-
-    # When you set a default share-level permission, all authenticated users and groups will have the same permission. 
-    # https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-assign-share-level-permissions?tabs=azure-powershell#share-level-permissions-for-all-authenticated-identities
-
-    $defaultPermission = "StorageFileDataSmbShareElevatedContributor" # Set the default permission of your choice
-    $account = Set-AzStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageAccountName -DefaultSharePermission $defaultPermission
-    $account.AzureFilesIdentityBasedAuth
-}
-
-function CreateStorage {
+function CreateNic {
 
 }
 
-function CreatePrivateEndpoint {
+function CreateSn {
 
+}
+
+function CreateNsg {
+
+}
+
+function CreatePep {
+
+    # Private Endpoint
     # "Integrate with private DNS zone" not needed when creating DNS records locally
 
 }
@@ -102,16 +101,22 @@ function AddPrivateLink {
 
 }
 
-function Debug {
+function CreateStorage {
 
-    # Feature rich debug
-
-    $trySubscription = Select-AzSubscription -SubscriptionId $SubscriptionId
-    if ( $trySubscription ) {
-        Debug-AzStorageAccountAuth -StorageAccountName $StorageAccountName -ResourceGroupName $ResourceGroupName -Verbose
-        Test-AzStorageAccountADObjectPasswordIsKerbKey -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -Verbose
-    }
 }
+
+# Site to Site connections and Local network gateways set up in portal
+
+function SetShareLvlPermissions {
+
+    # When you set a default share-level permission, all authenticated users and groups will have the same permission. 
+    # https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-assign-share-level-permissions?tabs=azure-powershell#share-level-permissions-for-all-authenticated-identities
+
+    $defaultPermission = "StorageFileDataSmbShareElevatedContributor" # Set the default permission of your choice
+    $account = Set-AzStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $StorageAccountName -DefaultSharePermission $defaultPermission
+    $account.AzureFilesIdentityBasedAuth
+}
+
 function JoinAzStorageAccount {
 
     # TODO: Add logic to remove existing service account
@@ -164,6 +169,17 @@ function MountDrive {
     }
     } catch {
         return $_.Exception
+    }
+}
+
+function Debug {
+
+    # Feature rich debug
+
+    $trySubscription = Select-AzSubscription -SubscriptionId $SubscriptionId
+    if ( $trySubscription ) {
+        Debug-AzStorageAccountAuth -StorageAccountName $StorageAccountName -ResourceGroupName $ResourceGroupName -Verbose
+        Test-AzStorageAccountADObjectPasswordIsKerbKey -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -Verbose
     }
 }
 
