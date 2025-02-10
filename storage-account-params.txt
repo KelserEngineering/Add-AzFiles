@@ -1,0 +1,85 @@
+Basics
+Subscription
+Azure subscription 1
+Resource group
+st-hoffman-files
+Location
+East US 2
+Storage account name
+hoffmanfiles
+Primary service
+Azure Files
+Performance
+Standard
+File share billing
+Pay-as-you-go file shares
+Replication
+Locally-redundant storage (LRS)
+Advanced
+Enable hierarchical namespace
+Disabled
+Enable SFTP
+Disabled
+Enable network file system v3
+Disabled
+Allow cross-tenant replication
+Disabled
+Access tier
+Hot
+Enable large file shares
+Enabled
+Security
+Secure transfer
+Enabled
+Blob anonymous access
+Disabled
+Allow storage account key access
+Enabled
+Default to Microsoft Entra authorization in the Azure portal
+Disabled
+Minimum TLS version
+Version 1.2
+Permitted scope for copy operations (preview)
+From any storage account
+Networking
+Network connectivity
+Private endpoint
+Private endpoint
+(New) hoffmanfiles (file)
+Default routing tier
+Microsoft network routing
+Data protection
+Point-in-time restore
+Disabled
+Blob soft delete
+Enabled
+Blob retainment period in days
+7
+Container soft delete
+Enabled
+Container retainment period in days
+7
+File share soft delete
+Enabled
+File share retainment period in days
+7
+Versioning
+Disabled
+Blob change feed
+Disabled
+Version-level immutability support
+Disabled
+Encryption
+Encryption type
+Microsoft-managed keys (MMK)
+Enable support for customer-managed keys
+Blobs and files only
+Enable infrastructure encryption
+Disabled
+Tags
+Application
+FileShare (Storage account)
+Application
+FileShare (Virtual network)
+Application
+FileShare (Private endpoint)

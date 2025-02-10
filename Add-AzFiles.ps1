@@ -1,29 +1,31 @@
 <#
 
-    https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-ad-ds-overview#overview
+https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-ad-ds-overview#overview
 
-    Follow these steps to set up Azure Files for AD DS authentication:
+Follow these steps to set up Azure Files for AD DS authentication:
 
-    Enable AD DS authentication on your storage account
+Enable AD DS authentication on your storage account
 
-        function JoinAzStorageAccount
+    function JoinAzStorageAccount
 
-    Assign share-level permissions to the Microsoft Entra identity (a user, group, or service principal) that is in sync with the target AD identity
+Assign share-level permissions to the Microsoft Entra identity (a user, group, or service principal) that is in sync with the target AD identity
 
-        function SetShareLvlPermissions
+    function SetShareLvlPermissions
 
-    Configure Windows ACLs over SMB for directories and files
+Configure Windows ACLs over SMB for directories and files
 
-    Mount an Azure file share to a VM joined to your AD DS
+Mount an Azure file share to a VM joined to your AD DS
 
-        function MountDrive
+    function MountDrive
 
-    Update the password of your storage account identity in AD DS
+Update the password of your storage account identity in AD DS
 
 #>
 param (
     [switch]$Mount,
-    [switch]$Debug
+    [switch]$Debug,
+    [switch]$TestStorageAccount,
+    [switch]$Join
 )
 
 $CsvFilePath = "creds.csv"
@@ -70,6 +72,16 @@ function SetShareLvlPermissions {
     $account.AzureFilesIdentityBasedAuth
 }
 
+function CreateStorage {
+
+}
+
+function CreatePrivateEndpoint {
+
+    # "Integrate with private DNS zone" not needed when creating DNS records locally
+
+}
+
 function AddPrivateLink {
 
     # When setting up Azure Files as a file server accessed over SMB on an internal domain, public access should be disabled.
@@ -78,8 +90,15 @@ function AddPrivateLink {
     # Azure Private Link establishes a connection between an Azure Storage Account and a virtual network
     # that can be accessible from an on-prem domain. It gives Azure Storage a vNIC and a private IP address.
 
+    # File share: Private Endpoint, Private Link, Azure Storage Account
+
     # This vNIC will connect directly to a Service Endpoint (an endpoint for multiple services located on the vNET).
-    # By only allowing traffic from the vNET through firewall configuration, the security posture is improved.
+    # By only allowing traffic from the vNET through the Storage Firewall configuration, the security posture is improved.
+
+    # NSGs restrict private networks. Storage Firewall restricts only public networks.
+
+    # Configure DNS to resolve the storage account to private IP
+    ## Primary forward resolver on the internal network to the vNET
 
 }
 
@@ -95,6 +114,8 @@ function Debug {
 }
 function JoinAzStorageAccount {
 
+    # TODO: Add logic to remove existing service account
+
     # Enable Active Directory Domain Services authentication for Azure file shares
 
     Join-AzStorageAccount `
@@ -103,6 +124,8 @@ function JoinAzStorageAccount {
         -SamAccountName $SamAccountName `
         -DomainAccountType $DomainAccountType `
         -OrganizationalUnitDistinguishedName $OuDistinguishedName
+    
+    SetShareLvlPermissions
 }
 
 function TestStorageAccount {
@@ -130,14 +153,14 @@ function MountDrive {
 
     # Mount Azure Files to SMB
 
-    $publicEndpoint = $StorageAccountName + ".file.core.windows.net"
+    $privateEndpoint = $StorageAccountName + ".privatelink.file.core.windows.net"
 
-    Write-Host $publicEndpoint
+    Write-Host $privateEndpoint
 
     try {
-        $connectTestResult = Test-NetConnection -ComputerName $publicEndpoint -Port 445
+        $connectTestResult = Test-NetConnection -ComputerName $privateEndpoint -Port 445
         if ($connectTestResult.TcpTestSucceeded) {
-            New-PSDrive -Name R -PSProvider FileSystem -Root "\\$publicEndpoint\$FileShare" -Persist
+            New-PSDrive -Name R -PSProvider FileSystem -Root "\\$privateEndpoint\$FileShare" -Persist
     }
     } catch {
         return $_.Exception
@@ -146,3 +169,5 @@ function MountDrive {
 
 if ($Mount) { MountDrive }
 if ($Debug) { Debug }
+if ($TestStorageAccount) { TestStorageAccount }
+if ($Join) { JoinAzStorageAccount }
