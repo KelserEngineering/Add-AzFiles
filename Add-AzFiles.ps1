@@ -1,24 +1,31 @@
+# AzFilesHybrid PowerShell Module required: https://github.com/Azure-Samples/azure-files-samples/releases
+
+# You must run this script and associated cmdlets from an on-premises AD DS-joined environment by a hybrid identity with the correct permissions.
+
+
 <#
+
+On-premises Active Directory Domain Services authentication over SMB for Azure file shares
 
 https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-ad-ds-overview#overview
 
-Follow these steps to set up Azure Files for AD DS authentication:
-
-Enable AD DS authentication on your storage account
+- Enable AD DS authentication on your storage account
 
     function JoinAzStorageAccount
 
-Assign share-level permissions to the Microsoft Entra identity (a user, group, or service principal) that is in sync with the target AD identity
+- Assign share-level permissions to the Microsoft Entra identity (a user, group, or service principal) that is in sync with the target AD identity
 
     function SetShareLvlPermissions
 
-Configure Windows ACLs over SMB for directories and files
+- Configure Windows ACLs over SMB for directories and files
 
-Mount an Azure file share to a VM joined to your AD DS
+- Mount an Azure file share to a VM joined to your AD DS
 
     function MountDrive
 
-Update the password of your storage account identity in AD DS
+- Update the password of your storage account identity in AD DS
+
+    function UpdatePassword
 
 #>
 param (
@@ -170,6 +177,15 @@ function MountDrive {
     } catch {
         return $_.Exception
     }
+}
+
+function UpdatePassword {
+    # Update the password of the AD DS account registered for the storage account
+    # You may use either kerb1 or kerb2
+    Update-AzStorageAccountADObjectPassword `
+    -RotateToKerbKey kerb2 `
+    -ResourceGroupName "<your-resource-group-name-here>" `
+    -StorageAccountName "<your-storage-account-name-here>"
 }
 
 function Debug {
